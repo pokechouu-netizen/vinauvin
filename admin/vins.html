@@ -176,7 +176,10 @@
         }
         return persist(msg);
       }).then(function () { closeModal(); render(); })
-        .catch(function (e) { CMS.status('error', 'Erreur — réessayez'); console.error(e); })
+        .catch(function (e) {
+          CMS.status('error', (e && e.friendly) ? e.message : 'Erreur d\'envoi — réessayez');
+          console.error(e);
+        })
         .then(function () { btn.disabled = false; });
     };
 

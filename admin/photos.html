@@ -131,7 +131,10 @@
             data.photos[key] = path;
             return persist('Photo remplacée : ' + label);
           }).then(render)
-            .catch(function (e) { CMS.status('error', 'Erreur — réessayez'); console.error(e); });
+            .catch(function (e) {
+              CMS.status('error', (e && e.friendly) ? e.message : 'Erreur d\'envoi — réessayez');
+              console.error(e);
+            });
         });
       });
     }

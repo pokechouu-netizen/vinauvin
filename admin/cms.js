@@ -63,20 +63,63 @@
     });
   }
   // Téléverse une image → renvoie son chemin dans le dépôt (assets/uploads/...)
-  function uploadImage(file, folder) {
-    folder = folder || 'assets/uploads';
+  // La photo est redimensionnée côté navigateur (max 1600px, JPEG) avant l'envoi :
+  // les photos de téléphone (5-10 Mo) dépassent sinon la limite de Git Gateway.
+  var IMG_MAX_DIM = 1600;
+  var IMG_MAX_RAW = 4 * 1024 * 1024;
+
+  function readAsDataURL(file) {
     return new Promise(function (resolve, reject) {
       var r = new FileReader();
-      r.onerror = reject;
-      r.onload = function (e) {
-        var b64 = e.target.result.split(',')[1];
-        var name = Date.now() + '_' + file.name.replace(/[^a-z0-9.\-_]/gi, '-').toLowerCase();
-        var path = folder + '/' + name;
-        gitPutRaw(path, { message: 'Image : ' + name, content: b64 })
-          .then(function () { resolve(path); }).catch(reject);
-      };
+      r.onerror = function () { reject(new Error('Impossible de lire le fichier')); };
+      r.onload = function (e) { resolve(e.target.result); };
       r.readAsDataURL(file);
     });
+  }
+
+  function downscaleImage(file) {
+    return readAsDataURL(file).then(function (dataUrl) {
+      return new Promise(function (resolve, reject) {
+        var img = new Image();
+        img.onload = function () {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          if (!w || !h) { reject(new Error('image-invalide')); return; }
+          var scale = Math.min(1, IMG_MAX_DIM / Math.max(w, h));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.round(w * scale);
+          canvas.height = Math.round(h * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          var isPng = file.type === 'image/png';
+          var out = canvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', 0.82);
+          resolve({ b64: out.split(',')[1], ext: isPng ? '.png' : '.jpg' });
+        };
+        img.onerror = function () { reject(new Error('decodage-image')); };
+        img.src = dataUrl;
+      });
+    });
+  }
+
+  function uploadImage(file, folder) {
+    folder = folder || 'assets/uploads';
+    return downscaleImage(file)
+      .catch(function () {
+        // Format que le navigateur ne sait pas décoder → envoi brut si raisonnable
+        if (file.size > IMG_MAX_RAW) {
+          var err = new Error('Photo trop lourde ou format non pris en charge — choisissez un JPG/PNG de moins de 4 Mo');
+          err.friendly = true;
+          throw err;
+        }
+        return readAsDataURL(file).then(function (dataUrl) {
+          var m = (file.name.match(/\.[a-z0-9]+$/i) || ['.jpg'])[0];
+          return { b64: dataUrl.split(',')[1], ext: m.toLowerCase() };
+        });
+      })
+      .then(function (imgData) {
+        var base = file.name.replace(/\.[a-z0-9]+$/i, '').replace(/[^a-z0-9\-_]/gi, '-').toLowerCase() || 'photo';
+        var path = folder + '/' + Date.now() + '_' + base + imgData.ext;
+        return gitPutRaw(path, { message: 'Image : ' + path, content: imgData.b64 })
+          .then(function () { return path; });
+      });
   }
 
   /* ---- déploiement (build hook stocké dans data/infos.json) ---- */
