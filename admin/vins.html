@@ -65,8 +65,9 @@
     </div>
   </div>
 
-  <script src="cms.js?v=3"></script>
-  <script src="tour.js?v=3"></script>
+  <script src="cms.js?v=4"></script>
+  <script src="tour.js?v=4"></script>
+  <script src="crop.js?v=4"></script>
   <script>
   (function () {
     'use strict';
@@ -150,10 +151,15 @@
     };
 
     document.getElementById('fPhoto').addEventListener('change', function () {
-      if (this.files && this.files[0]) {
-        pendingFile = this.files[0];
+      if (!this.files || !this.files[0]) return;
+      var original = this.files[0];
+      this.value = '';
+      // Recadrage au format bouteille (portrait 3:4) avant envoi
+      Crop.open(original, { aspect: 3 / 4, title: 'Photo de la bouteille' }).then(function (file) {
+        if (!file) return; // annulé
+        pendingFile = file;
         setPreview(URL.createObjectURL(pendingFile));
-      }
+      });
     });
 
     window.saveItem = function () {

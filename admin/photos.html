@@ -33,8 +33,9 @@
     </div>
   </div>
 
-  <script src="cms.js?v=3"></script>
-  <script src="tour.js?v=3"></script>
+  <script src="cms.js?v=4"></script>
+  <script src="tour.js?v=4"></script>
+  <script src="crop.js?v=4"></script>
   <script>
   (function () {
     'use strict';
@@ -43,43 +44,47 @@
     // affichés immédiatement, sans attendre le déploiement du site (~1 min)
     var freshPreviews = {};
 
-    // Emplacements groupés par section du site
+    // Emplacements groupés par section du site.
+    // aspect = format de recadrage proposé (correspond à l'affichage sur le site).
+    // Le logo n'est pas recadré (PNG avec transparence).
     var SECTIONS = [
       { titre: '🏠 Accueil & philosophie', slots: [
-        { key: 'img_hero', label: 'Grande photo d\'accueil' },
-        { key: 'img_philosophie', label: 'Photo « Notre philosophie »' },
-        { key: 'img_logo', label: 'Logo du site' }
+        { key: 'img_hero', label: 'Grande photo d\'accueil', aspect: 16 / 9 },
+        { key: 'img_philosophie', label: 'Photo « Notre philosophie »', aspect: 3 / 4 },
+        { key: 'img_logo', label: 'Logo du site', aspect: null }
       ]},
       { titre: '🍂 Les 4 saisons', slots: [
-        { key: 'img_saison_hiver', label: 'Hiver' },
-        { key: 'img_saison_printemps', label: 'Printemps' },
-        { key: 'img_saison_ete', label: 'Été' },
-        { key: 'img_saison_automne', label: 'Automne' }
+        { key: 'img_saison_hiver', label: 'Hiver', aspect: 4 / 3 },
+        { key: 'img_saison_printemps', label: 'Printemps', aspect: 4 / 3 },
+        { key: 'img_saison_ete', label: 'Été', aspect: 4 / 3 },
+        { key: 'img_saison_automne', label: 'Automne', aspect: 4 / 3 }
       ]},
       { titre: '🖼️ Galerie « Nos plats et ambiances »', slots: [
-        { key: 'img_galerie_1', label: 'Galerie — photo 1' },
-        { key: 'img_galerie_2', label: 'Galerie — photo 2' },
-        { key: 'img_galerie_3', label: 'Galerie — photo 3' },
-        { key: 'img_galerie_4', label: 'Galerie — photo 4' },
-        { key: 'img_galerie_5', label: 'Galerie — photo 5' },
-        { key: 'img_galerie_6', label: 'Galerie — photo 6' },
-        { key: 'img_galerie_7', label: 'Galerie — photo 7' },
-        { key: 'img_galerie_8', label: 'Galerie — photo 8' },
-        { key: 'img_galerie_9', label: 'Galerie — photo 9' },
-        { key: 'img_galerie_10', label: 'Galerie — photo 10' },
-        { key: 'img_galerie_11', label: 'Galerie — photo 11' },
-        { key: 'img_galerie_12', label: 'Galerie — photo 12' }
+        { key: 'img_galerie_1', label: 'Galerie — photo 1', aspect: 4 / 3 },
+        { key: 'img_galerie_2', label: 'Galerie — photo 2', aspect: 4 / 3 },
+        { key: 'img_galerie_3', label: 'Galerie — photo 3', aspect: 4 / 3 },
+        { key: 'img_galerie_4', label: 'Galerie — photo 4', aspect: 4 / 3 },
+        { key: 'img_galerie_5', label: 'Galerie — photo 5', aspect: 4 / 3 },
+        { key: 'img_galerie_6', label: 'Galerie — photo 6', aspect: 4 / 3 },
+        { key: 'img_galerie_7', label: 'Galerie — photo 7', aspect: 4 / 3 },
+        { key: 'img_galerie_8', label: 'Galerie — photo 8', aspect: 4 / 3 },
+        { key: 'img_galerie_9', label: 'Galerie — photo 9', aspect: 4 / 3 },
+        { key: 'img_galerie_10', label: 'Galerie — photo 10', aspect: 4 / 3 },
+        { key: 'img_galerie_11', label: 'Galerie — photo 11', aspect: 4 / 3 },
+        { key: 'img_galerie_12', label: 'Galerie — photo 12', aspect: 4 / 3 }
       ]},
       { titre: '☀️ Terrasse', slots: [
-        { key: 'img_terrasse_1', label: 'Devanture' },
-        { key: 'img_terrasse_2', label: 'Terrasse' }
+        { key: 'img_terrasse_1', label: 'Devanture', aspect: 4 / 3 },
+        { key: 'img_terrasse_2', label: 'Terrasse', aspect: 4 / 3 }
       ]},
       { titre: '🧀 Viandes, Fromages & Cave', slots: [
-        { key: 'img_produit_viande', label: 'Notre viande' },
-        { key: 'img_produit_fromage', label: 'Fromages' },
-        { key: 'img_produit_cave', label: 'Cave à vins' }
+        { key: 'img_produit_viande', label: 'Notre viande', aspect: 4 / 3 },
+        { key: 'img_produit_fromage', label: 'Fromages', aspect: 4 / 3 },
+        { key: 'img_produit_cave', label: 'Cave à vins', aspect: 4 / 3 }
       ]}
     ];
+    var SLOT_ASPECTS = {};
+    SECTIONS.forEach(function (sec) { sec.slots.forEach(function (s) { SLOT_ASPECTS[s.key] = s.aspect; }); });
 
     CMS.requireAuth(load);
 
@@ -128,26 +133,33 @@
           if (!this.files || !this.files[0]) return;
           var key = this.getAttribute('data-key');
           var label = this.getAttribute('data-label');
-          var file = this.files[0];
-          // Aperçu immédiat de la nouvelle photo, avant même la fin de l'envoi
-          if (freshPreviews[key]) URL.revokeObjectURL(freshPreviews[key]);
-          freshPreviews[key] = URL.createObjectURL(file);
-          render();
-          var hint = wrap.querySelector('[data-hint="' + key + '"]');
-          if (hint) hint.textContent = 'Envoi en cours…';
-          CMS.status('saving', 'Envoi de la photo…');
-          CMS.uploadImage(file).then(function (path) {
-            data.photos[key] = path;
-            return persist('Photo remplacée : ' + label);
-          }).then(render)
-            .catch(function (e) {
-              delete freshPreviews[key];
-              render();
-              var msg = (e && e.friendly) ? e.message
-                : 'Erreur d\'envoi (' + String(e && e.message || e).slice(0, 120) + ')';
-              CMS.status('error', msg);
-              console.error(e);
-            });
+          var original = this.files[0];
+          this.value = '';
+          // Recadrage avant envoi (sauf logo : PNG conservé tel quel)
+          var aspect = SLOT_ASPECTS[key];
+          var ready = aspect ? Crop.open(original, { aspect: aspect, title: label }) : Promise.resolve(original);
+          ready.then(function (file) {
+            if (!file) return; // recadrage annulé
+            // Aperçu immédiat de la nouvelle photo, avant même la fin de l'envoi
+            if (freshPreviews[key]) URL.revokeObjectURL(freshPreviews[key]);
+            freshPreviews[key] = URL.createObjectURL(file);
+            render();
+            var hint = wrap.querySelector('[data-hint="' + key + '"]');
+            if (hint) hint.textContent = 'Envoi en cours…';
+            CMS.status('saving', 'Envoi de la photo…');
+            CMS.uploadImage(file).then(function (path) {
+              data.photos[key] = path;
+              return persist('Photo remplacée : ' + label);
+            }).then(render)
+              .catch(function (e) {
+                delete freshPreviews[key];
+                render();
+                var msg = (e && e.friendly) ? e.message
+                  : 'Erreur d\'envoi (' + String(e && e.message || e).slice(0, 120) + ')';
+                CMS.status('error', msg);
+                console.error(e);
+              });
+          });
         });
       });
     }
@@ -157,7 +169,7 @@
       { el: null, title: 'Remplacer les photos du site 📷',
         text: 'Toutes les photos du site sont regroupées ici, classées par section : accueil, saisons, galerie, terrasse, produits et logo.' },
       { el: '#hintTop', title: '1. Comment remplacer une photo',
-        text: 'Cliquez simplement sur la photo à changer.\nVotre appareil vous propose de choisir une image (photo de la pellicule sur téléphone, fichier sur ordinateur).\nDès la sélection, la photo est envoyée et enregistrée automatiquement.' },
+        text: 'Cliquez simplement sur la photo à changer et choisissez une image sur votre appareil.\nUne fenêtre de recadrage s\'ouvre alors : déplacez la photo, zoomez avec le curseur, puis « Valider le cadrage » (ou « Photo entière » pour ne pas recadrer).\nL\'envoi et l\'enregistrement sont ensuite automatiques.' },
       { el: '#sections', title: '2. Retrouver le bon emplacement',
         text: 'Chaque vignette a un libellé qui indique où elle apparaît sur le site (ex : « Grande photo d’accueil », « Galerie — photo 3 »).\nFaites défiler pour voir toutes les sections.' },
       { el: '#statusEl', title: '3. Mise en ligne automatique',
