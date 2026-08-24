@@ -7,6 +7,6 @@
     { "id": "v4", "nom": "Domaine des Bosquets", "appellation": "Gigondas", "image": "assets/uploads/vin_4.jpg" },
     { "id": "v5", "nom": "Domaine Roucas Toumba", "appellation": "Vacqueyras", "image": "assets/uploads/vin_5.jpg" },
     { "id": "v6", "nom": "Domaine Chaume Arnaud", "appellation": "Vinsobres", "image": "assets/uploads/vin_6.jpg" },
-    { "id": "v7", "nom": "Domaine Combier", "appellation": "Crozes Hermitage", "image": "assets/uploads/vin_7.jpg" }
+    { "id": "v7", "nom": "Domaine Combier", "appellation": "Crozes-Hermitage", "image": "assets/uploads/vin_7.jpg" }
   ]
 }
