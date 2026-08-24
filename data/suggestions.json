@@ -1,21 +1,90 @@
 {
   "_commentaire": "Suggestions du moment. Modifiable depuis /admin → Suggestions. L'ordre du tableau = l'ordre d'affichage sur le site.",
   "suggestions": [
-    { "id": "s1", "nom": "Véritable charcuterie artisanale", "description": "" },
-    { "id": "s2", "nom": "Carpaccio de bœuf frais", "description": "" },
-    { "id": "s3", "nom": "Escargots à l'ail des ours", "description": "" },
-    { "id": "s4", "nom": "Aumônière de Saint-Nectaire fermier et poitrine roulée", "description": "" },
-    { "id": "s5", "nom": "La Grande Assiette Végé", "description": "" },
-    { "id": "s6", "nom": "Tartare de bœuf frais au couteau", "description": "" },
-    { "id": "s7", "nom": "Croustillant de veau fermier aux légumes estivaux et lait de coco", "description": "" },
-    { "id": "s8", "nom": "Petit épeautre bio de la Drôme comme un risotto", "description": "" },
-    { "id": "s9", "nom": "Entrecôte d'Aubrac", "description": "" },
-    { "id": "s10", "nom": "Abricots rôtis", "description": "" },
-    { "id": "s11", "nom": "Crème au citron", "description": "" },
-    { "id": "s12", "nom": "Le midi, menus à 25 € et 32 €", "description": "" },
-    { "id": "s13", "nom": "Formule du jour le midi de 17 à 22 € (hors week-ends et jours fériés)", "description": "" },
-    { "id": "s14", "nom": "Les très grandes salades repas", "description": "" },
-    { "id": "s15", "nom": "Fromages fermiers au lait cru", "description": "" },
-    { "id": "s16", "nom": "Tarte rhubarbe", "description": "" }
+    {
+      "id": "s1",
+      "nom": "Véritable charcuterie artisanale",
+      "description": ""
+    },
+    {
+      "id": "s2",
+      "nom": "Carpaccio de bœuf frais",
+      "description": ""
+    },
+    {
+      "id": "s3",
+      "nom": "Escargots à l'ail des ours",
+      "description": ""
+    },
+    {
+      "id": "s4",
+      "nom": "Aumônière de Saint-Nectaire fermier et poitrine roulée",
+      "description": ""
+    },
+    {
+      "id": "s5",
+      "nom": "La Grande Assiette Végé",
+      "description": ""
+    },
+    {
+      "id": "s6",
+      "nom": "Tartare de bœuf frais au couteau",
+      "description": ""
+    },
+    {
+      "id": "s7",
+      "nom": "Croustillant de veau fermier aux légumes estivaux et lait de coco",
+      "description": ""
+    },
+    {
+      "id": "s8",
+      "nom": "Petit épeautre bio de la Drôme comme un risotto",
+      "description": ""
+    },
+    {
+      "id": "s9",
+      "nom": "Entrecôte d'Aubrac",
+      "description": ""
+    },
+    {
+      "id": "s10",
+      "nom": "Abricots rôtis",
+      "description": ""
+    },
+    {
+      "id": "s11",
+      "nom": "Crème au citron",
+      "description": ""
+    },
+    {
+      "id": "s12",
+      "nom": "Le midi, menus à 25 € et 32 €",
+      "description": ""
+    },
+    {
+      "id": "s13",
+      "nom": "Formule du jour le midi de 17 à 22 € (hors week-ends et jours fériés)",
+      "description": ""
+    },
+    {
+      "id": "s14",
+      "nom": "Les très grandes salades repas",
+      "description": ""
+    },
+    {
+      "id": "s15",
+      "nom": "Fromages fermiers au lait cru",
+      "description": ""
+    },
+    {
+      "id": "s16",
+      "nom": "Tarte rhubarbe",
+      "description": ""
+    },
+    {
+      "id": "s1787607020145",
+      "nom": "blabla",
+      "description": ""
+    }
   ]
 }
