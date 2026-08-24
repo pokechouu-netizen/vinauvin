@@ -464,21 +464,7 @@
     <div class="container">
       <span class="section-tag" data-fr="Suivez-nous" data-en="Follow us">Suivez-nous</span>
       <h2 class="section-title" data-fr="Nos actualités" data-en="Our news">Nos actualités</h2>
-      <p class="section-subtitle" data-fr="Retrouvez nos dernières nouvelles, événements et plats du moment sur notre page Facebook." data-en="Find our latest news, events and dishes on our Facebook page.">Retrouvez nos dernières nouvelles, événements et plats du moment sur notre page Facebook.</p>
-      <div class="actualites-widget" id="fbWidget"></div>
-      <script>
-      (function(){
-        var c=document.getElementById('fbWidget');
-        function render(){
-          var w=Math.min(500,c.clientWidth);
-          var h=w<400?500:600;
-          c.innerHTML='<iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fauvinsurvinatulette&tabs=timeline&width='+w+'&height='+h+'&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&locale=fr_FR" width="'+w+'" height="'+h+'" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" loading="lazy" title="Page Facebook Au Vin sur Vin"></iframe>';
-        }
-        render();
-        var t;window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(render,300)});
-      })();
-      </script>
-      <!-- Secours : le fil ci-dessus peut rester vide chez les visiteurs non connectés à Facebook (restriction Meta) -->
+      <p class="section-subtitle" data-fr="Retrouvez nos dernières nouvelles, événements et plats du moment sur nos réseaux sociaux." data-en="Find our latest news, events and dishes on our social media.">Retrouvez nos dernières nouvelles, événements et plats du moment sur nos réseaux sociaux.</p>
       <div class="actualites-btns" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem">
         <a href="https://www.facebook.com/auvinsurvinatulette/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-glow">
           <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385h-3.047v-3.47h3.047v-2.642c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.514c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385c5.738-.9 10.126-5.864 10.126-11.854z"/></svg>
