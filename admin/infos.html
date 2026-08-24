@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Infos pratiques — Admin Au Vin sur Vin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+  <div id="loginScreen">
+    <div class="brand">Au Vin sur Vin</div>
+    <h1>Espace d'administration</h1>
+    <p>Connectez-vous pour gérer les horaires, le téléphone et les prix.</p>
+    <button class="btn-login" onclick="CMS.login()">Se connecter</button>
+  </div>
+
+  <div id="adminScreen">
+    <div class="topbar">
+      <h1>⏰ Infos pratiques</h1>
+      <span class="status" id="statusEl"></span>
+      <button class="btn btn-ghost btn-sm" id="btnTuto">❓ Tutoriel</button>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Admin</a>
+      <button class="btn-text" onclick="CMS.logout()">Déconnexion</button>
+    </div>
+
+    <div class="panel active">
+
+      <!-- Horaires -->
+      <div class="section-card" id="cardHoraires">
+        <div class="section-card__title">🕒 Horaires d'ouverture</div>
+        <p class="panel-hint">Pour chaque jour : le service du midi et le service du soir.
+          Écrivez « Fermé » (ou laissez vide) pour un service fermé.
+          La note sert aux fermetures exceptionnelles (ex : « Fermé le 24/12 »).</p>
+        <div id="horairesRows"><div class="loading">Chargement…</div></div>
+        <div class="form-save-row">
+          <button class="btn btn-primary" id="btnSaveHoraires">Enregistrer les horaires</button>
+        </div>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="section-card" id="cardTel">
+        <div class="section-card__title">📞 Téléphone</div>
+        <div class="fg">
+          <label>Numéro affiché sur le site</label>
+          <input type="text" id="fTel" placeholder="Ex : 04 75 98 34 43">
+        </div>
+        <div class="form-save-row">
+          <button class="btn btn-primary" id="btnSaveInfos1">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Prix -->
+      <div class="section-card" id="cardPrix">
+        <div class="section-card__title">💶 Fourchettes de prix</div>
+        <p class="panel-hint">Affichées sous les suggestions, sous la forme « Entrées 8 à 14 € · Plats … · Desserts … ».</p>
+        <div class="frow">
+          <div class="fg"><label>Entrées</label><input type="text" id="fPrixEntrees" placeholder="Ex : 8 à 14 €"></div>
+          <div class="fg"><label>Plats</label><input type="text" id="fPrixPlats" placeholder="Ex : 16 à 25 €"></div>
+        </div>
+        <div class="fg"><label>Desserts</label><input type="text" id="fPrixDesserts" placeholder="Ex : 6 à 10 €"></div>
+        <div class="form-save-row">
+          <button class="btn btn-primary" id="btnSaveInfos2">Enregistrer</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="cms.js"></script>
+  <script src="tour.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var H_FILE = 'data/horaires.json', hData = { horaires: [] }, hSha = '';
+    var I_FILE = 'data/infos.json', iData = {}, iSha = '';
+    var JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+    CMS.requireAuth(load);
+
+    function load() {
+      CMS.status('saving', 'Chargement…');
+      Promise.all([CMS.load(H_FILE), CMS.load(I_FILE)]).then(function (rs) {
+        hData = rs[0].data; hSha = rs[0].sha;
+        iData = rs[1].data; iSha = rs[1].sha;
+        if (!Array.isArray(hData.horaires)) hData.horaires = [];
+        CMS.status('', '');
+        renderHoraires();
+        fillInfos();
+      }).catch(function (e) { CMS.status('error', 'Erreur de chargement'); console.error(e); });
+    }
+
+    function saved() {
+      CMS.status('saved', 'Enregistré ✓ — en ligne dans ~1 min');
+      setTimeout(function () { CMS.status('', ''); }, 4000);
+    }
+    function failed(e) { CMS.status('error', 'Erreur d\'enregistrement'); console.error(e); }
+
+    /* ---- Horaires ---- */
+    function getDay(jour) {
+      for (var i = 0; i < hData.horaires.length; i++) {
+        if (hData.horaires[i].jour === jour) return hData.horaires[i];
+      }
+      return { jour: jour, midi: '', soir: '', note: '' };
+    }
+
+    function renderHoraires() {
+      var wrap = document.getElementById('horairesRows');
+      wrap.innerHTML = '<div class="frow" style="grid-template-columns:90px 1fr 1fr 1fr;gap:.5rem;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase"><span></span><span>Midi</span><span>Soir</span><span>Note</span></div>';
+      JOURS.forEach(function (jour) {
+        var d = getDay(jour);
+        var row = document.createElement('div');
+        row.className = 'frow';
+        row.style.cssText = 'grid-template-columns:90px 1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem;align-items:center';
+        row.innerHTML =
+          '<strong style="font-size:.85rem">' + jour + '</strong>' +
+          '<input type="text" data-jour="' + jour + '" data-field="midi" value="' + CMS.esc(d.midi) + '" placeholder="Fermé" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">' +
+          '<input type="text" data-jour="' + jour + '" data-field="soir" value="' + CMS.esc(d.soir) + '" placeholder="Fermé" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">' +
+          '<input type="text" data-jour="' + jour + '" data-field="note" value="' + CMS.esc(d.note) + '" placeholder="—" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">';
+        wrap.appendChild(row);
+      });
+    }
+
+    document.getElementById('btnSaveHoraires').addEventListener('click', function () {
+      var rows = {};
+      JOURS.forEach(function (j) { rows[j] = { jour: j, midi: '', soir: '', note: '' }; });
+      document.querySelectorAll('#horairesRows input[data-jour]').forEach(function (inp) {
+        rows[inp.getAttribute('data-jour')][inp.getAttribute('data-field')] = inp.value.trim();
+      });
+      hData.horaires = JOURS.map(function (j) { return rows[j]; });
+      CMS.status('saving', 'Enregistrement…');
+      CMS.save(H_FILE, hData, hSha, 'Horaires mis à jour').then(function (s) { hSha = s; saved(); }).catch(failed);
+    });
+
+    /* ---- Infos (téléphone + prix) ---- */
+    function fillInfos() {
+      document.getElementById('fTel').value = iData.telephone || '';
+      document.getElementById('fPrixEntrees').value = iData.prix_entrees || '';
+      document.getElementById('fPrixPlats').value = iData.prix_plats || '';
+      document.getElementById('fPrixDesserts').value = iData.prix_desserts || '';
+    }
+
+    function saveInfos() {
+      iData.telephone = document.getElementById('fTel').value.trim();
+      iData.telephone_raw = iData.telephone.replace(/[^0-9+]/g, '');
+      iData.prix_entrees = document.getElementById('fPrixEntrees').value.trim();
+      iData.prix_plats = document.getElementById('fPrixPlats').value.trim();
+      iData.prix_desserts = document.getElementById('fPrixDesserts').value.trim();
+      CMS.status('saving', 'Enregistrement…');
+      CMS.save(I_FILE, iData, iSha, 'Infos pratiques mises à jour').then(function (s) { iSha = s; saved(); }).catch(failed);
+    }
+    document.getElementById('btnSaveInfos1').addEventListener('click', saveInfos);
+    document.getElementById('btnSaveInfos2').addEventListener('click', saveInfos);
+
+    /* ---- Tutoriel ---- */
+    var TOUR = [
+      { el: null, title: 'Infos pratiques ⏰',
+        text: 'Cette page regroupe les horaires d’ouverture, le numéro de téléphone et les fourchettes de prix affichés sur le site.' },
+      { el: '#cardHoraires', title: '1. Les horaires',
+        text: 'Une ligne par jour, avec le service du midi et celui du soir.\nÉcrivez « Fermé » (ou laissez vide) quand c’est fermé.\nLa colonne Note sert aux fermetures exceptionnelles (congés, jours fériés…).\nPuis cliquez « Enregistrer les horaires ».' },
+      { el: '#cardTel', title: '2. Le téléphone',
+        text: 'Le numéro affiché partout sur le site (bouton « Réserver », section contact…).\nModifiez-le puis cliquez « Enregistrer ».' },
+      { el: '#cardPrix', title: '3. Les prix',
+        text: 'Les fourchettes de prix affichées sous les suggestions.\nExemple : « 8 à 14 € ». Puis « Enregistrer ».' },
+      { el: '#statusEl', title: '4. Mise en ligne automatique',
+        text: 'Quand « Enregistré ✓ » s’affiche, le site en ligne se met à jour tout seul en 1 minute environ.' }
+    ];
+    document.getElementById('btnTuto').addEventListener('click', function () { Tour.start(TOUR); });
+  })();
+  </script>
+</body>
+</html>

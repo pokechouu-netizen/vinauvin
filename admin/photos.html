@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Photos — Admin Au Vin sur Vin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+  <div id="loginScreen">
+    <div class="brand">Au Vin sur Vin</div>
+    <h1>Espace d'administration</h1>
+    <p>Connectez-vous pour gérer les photos du site.</p>
+    <button class="btn-login" onclick="CMS.login()">Se connecter</button>
+  </div>
+
+  <div id="adminScreen">
+    <div class="topbar">
+      <h1>📷 Photos du site</h1>
+      <span class="status" id="statusEl"></span>
+      <button class="btn btn-ghost btn-sm" id="btnTuto">❓ Tutoriel</button>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Admin</a>
+      <button class="btn-text" onclick="CMS.logout()">Déconnexion</button>
+    </div>
+
+    <div class="panel active">
+      <p class="panel-hint" id="hintTop">Cliquez sur une photo pour la remplacer : choisissez la nouvelle image sur votre appareil,
+        elle est envoyée et mise en ligne automatiquement (~1 min). Chaque emplacement correspond à un endroit précis du site.</p>
+      <div id="sections"><div class="loading">Chargement…</div></div>
+    </div>
+  </div>
+
+  <script src="cms.js"></script>
+  <script src="tour.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var FILE = 'data/photos.json', data = { photos: {} }, sha = '';
+
+    // Emplacements groupés par section du site
+    var SECTIONS = [
+      { titre: '🏠 Accueil & philosophie', slots: [
+        { key: 'img_hero', label: 'Grande photo d\'accueil' },
+        { key: 'img_philosophie', label: 'Photo « Notre philosophie »' },
+        { key: 'img_logo', label: 'Logo du site' }
+      ]},
+      { titre: '🍂 Les 4 saisons', slots: [
+        { key: 'img_saison_hiver', label: 'Hiver' },
+        { key: 'img_saison_printemps', label: 'Printemps' },
+        { key: 'img_saison_ete', label: 'Été' },
+        { key: 'img_saison_automne', label: 'Automne' }
+      ]},
+      { titre: '🖼️ Galerie « Nos plats et ambiances »', slots: [
+        { key: 'img_galerie_1', label: 'Galerie — photo 1' },
+        { key: 'img_galerie_2', label: 'Galerie — photo 2' },
+        { key: 'img_galerie_3', label: 'Galerie — photo 3' },
+        { key: 'img_galerie_4', label: 'Galerie — photo 4' },
+        { key: 'img_galerie_5', label: 'Galerie — photo 5' },
+        { key: 'img_galerie_6', label: 'Galerie — photo 6' },
+        { key: 'img_galerie_7', label: 'Galerie — photo 7' },
+        { key: 'img_galerie_8', label: 'Galerie — photo 8' },
+        { key: 'img_galerie_9', label: 'Galerie — photo 9' },
+        { key: 'img_galerie_10', label: 'Galerie — photo 10' },
+        { key: 'img_galerie_11', label: 'Galerie — photo 11' },
+        { key: 'img_galerie_12', label: 'Galerie — photo 12' }
+      ]},
+      { titre: '☀️ Terrasse', slots: [
+        { key: 'img_terrasse_1', label: 'Devanture' },
+        { key: 'img_terrasse_2', label: 'Terrasse' }
+      ]},
+      { titre: '🧀 Viandes, Fromages & Cave', slots: [
+        { key: 'img_produit_viande', label: 'Notre viande' },
+        { key: 'img_produit_fromage', label: 'Fromages' },
+        { key: 'img_produit_cave', label: 'Cave à vins' }
+      ]}
+    ];
+
+    CMS.requireAuth(load);
+
+    function load() {
+      CMS.status('saving', 'Chargement…');
+      CMS.load(FILE).then(function (r) {
+        data = r.data; sha = r.sha;
+        if (!data.photos) data.photos = {};
+        CMS.status('', ''); render();
+      }).catch(function (e) { CMS.status('error', 'Erreur de chargement'); console.error(e); });
+    }
+
+    function persist(msg) {
+      CMS.status('saving', 'Enregistrement…');
+      return CMS.save(FILE, data, sha, msg).then(function (newSha) {
+        sha = newSha;
+        CMS.status('saved', 'Enregistré ✓ — en ligne dans ~1 min');
+        setTimeout(function () { CMS.status('', ''); }, 4000);
+      }).catch(function (e) { CMS.status('error', 'Erreur d\'enregistrement'); console.error(e); throw e; });
+    }
+
+    function render() {
+      var wrap = document.getElementById('sections');
+      wrap.innerHTML = '';
+      SECTIONS.forEach(function (sec) {
+        var card = document.createElement('div');
+        card.className = 'section-card';
+        var grid = '<div class="photos-grid">';
+        sec.slots.forEach(function (slot) {
+          var src = data.photos[slot.key] || '';
+          grid += '<div class="photo-slot"><span class="photo-slot__label">' + CMS.eh(slot.label) + '</span>' +
+            '<div class="photo-slot__wrap">' +
+            '<input type="file" accept="image/*" data-key="' + slot.key + '" data-label="' + CMS.esc(slot.label) + '">' +
+            (src ? '<img src="' + CMS.esc(CMS.imgSrc(src)) + '" alt="">' :
+              '<div class="photo-slot__empty">📷<br>Aucune photo<br>Cliquer pour ajouter</div>') +
+            '</div>' +
+            '<div class="photo-slot__hint">Cliquer pour remplacer</div></div>';
+        });
+        grid += '</div>';
+        card.innerHTML = '<div class="section-card__title">' + sec.titre + '</div>' + grid;
+        wrap.appendChild(card);
+      });
+
+      wrap.querySelectorAll('input[type="file"]').forEach(function (input) {
+        input.addEventListener('change', function () {
+          if (!this.files || !this.files[0]) return;
+          var key = this.getAttribute('data-key');
+          var label = this.getAttribute('data-label');
+          var file = this.files[0];
+          CMS.status('saving', 'Envoi de la photo…');
+          CMS.uploadImage(file).then(function (path) {
+            data.photos[key] = path;
+            return persist('Photo remplacée : ' + label);
+          }).then(render)
+            .catch(function (e) { CMS.status('error', 'Erreur — réessayez'); console.error(e); });
+        });
+      });
+    }
+
+    /* ---- Tutoriel ---- */
+    var TOUR = [
+      { el: null, title: 'Remplacer les photos du site 📷',
+        text: 'Toutes les photos du site sont regroupées ici, classées par section : accueil, saisons, galerie, terrasse, produits et logo.' },
+      { el: '#hintTop', title: '1. Comment remplacer une photo',
+        text: 'Cliquez simplement sur la photo à changer.\nVotre appareil vous propose de choisir une image (photo de la pellicule sur téléphone, fichier sur ordinateur).\nDès la sélection, la photo est envoyée et enregistrée automatiquement.' },
+      { el: '#sections', title: '2. Retrouver le bon emplacement',
+        text: 'Chaque vignette a un libellé qui indique où elle apparaît sur le site (ex : « Grande photo d’accueil », « Galerie — photo 3 »).\nFaites défiler pour voir toutes les sections.' },
+      { el: '#statusEl', title: '3. Mise en ligne automatique',
+        text: 'Quand « Enregistré ✓ » s’affiche ici, c’est validé : le site en ligne montre la nouvelle photo au bout d’1 minute environ.\nConseil : privilégiez des photos nettes, en format paysage, de moins de 5 Mo.' }
+    ];
+    document.getElementById('btnTuto').addEventListener('click', function () { Tour.start(TOUR); });
+  })();
+  </script>
+</body>
+</html>

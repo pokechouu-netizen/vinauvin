@@ -1,0 +1,13 @@
+# Netlify
+.netlify
+
+# OS
+.DS_Store
+
+# Node
+node_modules
+
+# Dev local
+.claude/
+server.ps1
+*.bak

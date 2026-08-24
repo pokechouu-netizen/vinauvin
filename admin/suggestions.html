@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suggestions du moment — Admin Au Vin sur Vin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+  <div id="loginScreen">
+    <div class="brand">Au Vin sur Vin</div>
+    <h1>Espace d'administration</h1>
+    <p>Connectez-vous pour gérer les suggestions du moment.</p>
+    <button class="btn-login" onclick="CMS.login()">Se connecter</button>
+  </div>
+
+  <div id="adminScreen">
+    <div class="topbar">
+      <h1>🍽️ Suggestions du moment</h1>
+      <span class="status" id="statusEl"></span>
+      <button class="btn btn-ghost btn-sm" id="btnTuto">❓ Tutoriel</button>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Admin</a>
+      <button class="btn-text" onclick="CMS.logout()">Déconnexion</button>
+    </div>
+
+    <div class="panel active">
+      <div class="panel-header">
+        <h2>Vos suggestions</h2>
+        <button class="btn btn-primary" id="btnAdd">+ Ajouter une suggestion</button>
+      </div>
+      <p class="panel-hint">Les suggestions s'affichent sur le site dans la section « Suggestions du moment », dans l'ordre ci-dessous.
+        Utilisez les flèches ↑ ↓ pour changer l'ordre. Vous pouvez en ajouter autant que vous voulez.</p>
+      <div class="card-list" id="list"><div class="loading">Chargement…</div></div>
+    </div>
+  </div>
+
+  <!-- Modale ajout / édition -->
+  <div class="overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 id="modalTitle">Ajouter une suggestion</h2>
+      <div class="fg" id="fgNom">
+        <label>Nom du plat / menu *</label>
+        <input type="text" id="fNom" placeholder="Ex : Tartare de bœuf frais au couteau">
+      </div>
+      <div class="fg" id="fgDesc">
+        <label>Description <span class="hint">(facultatif — s'affiche sous le nom)</span></label>
+        <textarea id="fDesc" placeholder="Ex : Servi avec frites maison et salade"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+        <button class="btn btn-primary" id="btnSave" onclick="saveItem()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="cms.js"></script>
+  <script src="tour.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var FILE = 'data/suggestions.json', data = { suggestions: [] }, sha = '', editIdx = -1;
+
+    CMS.requireAuth(load);
+
+    function load() {
+      CMS.status('saving', 'Chargement…');
+      CMS.load(FILE).then(function (r) {
+        data = r.data; sha = r.sha;
+        if (!Array.isArray(data.suggestions)) data.suggestions = [];
+        CMS.status('', ''); render();
+      }).catch(function (e) { CMS.status('error', 'Erreur de chargement'); console.error(e); });
+    }
+
+    function persist(msg) {
+      CMS.status('saving', 'Enregistrement…');
+      return CMS.save(FILE, data, sha, msg).then(function (newSha) {
+        sha = newSha;
+        CMS.status('saved', 'Enregistré ✓ — en ligne dans ~1 min');
+        setTimeout(function () { CMS.status('', ''); }, 4000);
+      }).catch(function (e) { CMS.status('error', 'Erreur d\'enregistrement'); console.error(e); throw e; });
+    }
+
+    function render() {
+      var list = document.getElementById('list');
+      if (!data.suggestions.length) {
+        list.innerHTML = '<div class="placeholder">Aucune suggestion pour le moment.<br>Cliquez sur « + Ajouter une suggestion ».</div>';
+        return;
+      }
+      list.innerHTML = '';
+      data.suggestions.forEach(function (s, i) {
+        var card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML =
+          '<div class="item-card__body"><div class="item-card__title">' + CMS.eh(s.nom) + '</div>' +
+          (s.description ? '<div class="item-card__text">' + CMS.eh(s.description) + '</div>' : '') + '</div>' +
+          '<div class="item-card__actions">' +
+          '<button class="btn btn-ghost btn-sm" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveItem(' + i + ',-1)">↑</button>' +
+          '<button class="btn btn-ghost btn-sm" ' + (i === data.suggestions.length - 1 ? 'disabled' : '') + ' onclick="moveItem(' + i + ',1)">↓</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="editItem(' + i + ')">✏️ Modifier</button>' +
+          '<button class="btn btn-danger btn-sm" onclick="deleteItem(' + i + ')">Supprimer</button>' +
+          '</div>';
+        list.appendChild(card);
+      });
+    }
+
+    window.openModal = function () {
+      editIdx = -1;
+      document.getElementById('modalTitle').textContent = 'Ajouter une suggestion';
+      document.getElementById('fNom').value = '';
+      document.getElementById('fDesc').value = '';
+      document.getElementById('modal').classList.add('open');
+    };
+    window.closeModal = function () { document.getElementById('modal').classList.remove('open'); };
+
+    window.editItem = function (i) {
+      editIdx = i;
+      var s = data.suggestions[i];
+      document.getElementById('modalTitle').textContent = 'Modifier la suggestion';
+      document.getElementById('fNom').value = s.nom || '';
+      document.getElementById('fDesc').value = s.description || '';
+      document.getElementById('modal').classList.add('open');
+    };
+
+    window.saveItem = function () {
+      var nom = document.getElementById('fNom').value.trim();
+      if (!nom) { alert('Le nom est obligatoire.'); return; }
+      var desc = document.getElementById('fDesc').value.trim();
+      var msg;
+      if (editIdx >= 0) {
+        data.suggestions[editIdx].nom = nom;
+        data.suggestions[editIdx].description = desc;
+        msg = 'Suggestion modifiée : ' + nom;
+      } else {
+        data.suggestions.push({ id: 's' + Date.now(), nom: nom, description: desc });
+        msg = 'Suggestion ajoutée : ' + nom;
+      }
+      persist(msg).then(function () { closeModal(); render(); });
+    };
+
+    window.deleteItem = function (i) {
+      var s = data.suggestions[i];
+      if (!confirm('Supprimer « ' + s.nom + ' » ?')) return;
+      data.suggestions.splice(i, 1);
+      persist('Suggestion supprimée : ' + s.nom).then(render);
+    };
+
+    window.moveItem = function (i, dir) {
+      var j = i + dir;
+      if (j < 0 || j >= data.suggestions.length) return;
+      var tmp = data.suggestions[i];
+      data.suggestions[i] = data.suggestions[j];
+      data.suggestions[j] = tmp;
+      render();
+      persist('Ordre des suggestions modifié');
+    };
+
+    document.getElementById('btnAdd').addEventListener('click', openModal);
+
+    /* ---- Tutoriel ---- */
+    var TOUR = [
+      { el: null, title: 'Gérer vos suggestions 🍽️',
+        text: 'Cette page pilote la section « Suggestions du moment » du site.\nVoici comment ajouter, modifier, réordonner ou supprimer un plat.' },
+      { el: '#btnAdd', title: '1. Ajouter une suggestion',
+        text: 'Cliquez ici pour ouvrir la fenêtre d’ajout : saisissez le nom du plat (obligatoire) et une description si vous voulez, puis « Enregistrer ».\nAucune limite : ajoutez autant de suggestions que nécessaire.' },
+      { el: '#list', title: '2. Modifier, réordonner, supprimer',
+        text: 'Chaque ligne est une suggestion affichée sur le site.\n✏️ Modifier : changer le nom ou la description.\n↑ ↓ : changer l’ordre d’affichage.\nSupprimer : retirer le plat (une confirmation est demandée).' },
+      { el: '#statusEl', title: '3. L’enregistrement est automatique',
+        text: 'Après chaque action, l’état s’affiche ici : « Enregistré ✓ ».\nLe site en ligne se met à jour tout seul en 1 minute environ. Rien d’autre à faire !' },
+      { el: null, title: 'C’est tout ! ✨',
+        text: 'Astuce : mettez les plats du jour en haut de la liste avec les flèches ↑.\nPensez à supprimer les plats qui ne sont plus servis.' }
+    ];
+    document.getElementById('btnTuto').addEventListener('click', function () { Tour.start(TOUR); });
+  })();
+  </script>
+</body>
+</html>

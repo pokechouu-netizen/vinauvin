@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vins — Admin Au Vin sur Vin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+  <div id="loginScreen">
+    <div class="brand">Au Vin sur Vin</div>
+    <h1>Espace d'administration</h1>
+    <p>Connectez-vous pour gérer les vins du carrousel.</p>
+    <button class="btn-login" onclick="CMS.login()">Se connecter</button>
+  </div>
+
+  <div id="adminScreen">
+    <div class="topbar">
+      <h1>🍷 Vins du carrousel</h1>
+      <span class="status" id="statusEl"></span>
+      <button class="btn btn-ghost btn-sm" id="btnTuto">❓ Tutoriel</button>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Admin</a>
+      <button class="btn-text" onclick="CMS.logout()">Déconnexion</button>
+    </div>
+
+    <div class="panel active">
+      <div class="panel-header">
+        <h2>Vos vins</h2>
+        <button class="btn btn-primary" id="btnAdd">+ Ajouter un vin</button>
+      </div>
+      <p class="panel-hint">Ces vins défilent dans la section « Nos vins » du site, dans l'ordre ci-dessous.
+        Utilisez les flèches ↑ ↓ pour changer l'ordre.</p>
+      <div class="card-list" id="list"><div class="loading">Chargement…</div></div>
+    </div>
+  </div>
+
+  <!-- Modale ajout / édition -->
+  <div class="overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 id="modalTitle">Ajouter un vin</h2>
+      <div class="fg">
+        <label>Nom du domaine / du vin *</label>
+        <input type="text" id="fNom" placeholder="Ex : Domaine Christophe Pichon">
+      </div>
+      <div class="fg">
+        <label>Appellation <span class="hint">(facultatif)</span></label>
+        <input type="text" id="fAppellation" placeholder="Ex : Côte-Rôtie">
+      </div>
+      <div class="fg" id="fgPhoto">
+        <label>Photo de la bouteille <span class="hint">(facultatif — prise verticale conseillée)</span></label>
+        <div class="photo-slot__wrap" style="aspect-ratio:3/4;max-width:180px">
+          <input type="file" id="fPhoto" accept="image/*">
+          <img id="fPhotoPreview" alt="" style="display:none">
+          <div class="photo-slot__empty" id="fPhotoEmpty">📷<br>Cliquer pour choisir<br>une photo</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+        <button class="btn btn-primary" id="btnSave" onclick="saveItem()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="cms.js"></script>
+  <script src="tour.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var FILE = 'data/vins.json', data = { vins: [] }, sha = '', editIdx = -1, pendingFile = null;
+
+    CMS.requireAuth(load);
+
+    function load() {
+      CMS.status('saving', 'Chargement…');
+      CMS.load(FILE).then(function (r) {
+        data = r.data; sha = r.sha;
+        if (!Array.isArray(data.vins)) data.vins = [];
+        CMS.status('', ''); render();
+      }).catch(function (e) { CMS.status('error', 'Erreur de chargement'); console.error(e); });
+    }
+
+    function persist(msg) {
+      CMS.status('saving', 'Enregistrement…');
+      return CMS.save(FILE, data, sha, msg).then(function (newSha) {
+        sha = newSha;
+        CMS.status('saved', 'Enregistré ✓ — en ligne dans ~1 min');
+        setTimeout(function () { CMS.status('', ''); }, 4000);
+      }).catch(function (e) { CMS.status('error', 'Erreur d\'enregistrement'); console.error(e); throw e; });
+    }
+
+    function render() {
+      var list = document.getElementById('list');
+      if (!data.vins.length) {
+        list.innerHTML = '<div class="placeholder">Aucun vin pour le moment.<br>Cliquez sur « + Ajouter un vin ».</div>';
+        return;
+      }
+      list.innerHTML = '';
+      data.vins.forEach(function (v, i) {
+        var card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML =
+          (v.image ? '<img class="thumb" src="' + CMS.esc(CMS.imgSrc(v.image)) + '" alt="">' : '<div class="no-thumb">🍷</div>') +
+          '<div class="item-card__body"><div class="item-card__title">' + CMS.eh(v.nom) + '</div>' +
+          (v.appellation ? '<div class="item-card__text">' + CMS.eh(v.appellation) + '</div>' : '') + '</div>' +
+          '<div class="item-card__actions">' +
+          '<button class="btn btn-ghost btn-sm" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveItem(' + i + ',-1)">↑</button>' +
+          '<button class="btn btn-ghost btn-sm" ' + (i === data.vins.length - 1 ? 'disabled' : '') + ' onclick="moveItem(' + i + ',1)">↓</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="editItem(' + i + ')">✏️ Modifier</button>' +
+          '<button class="btn btn-danger btn-sm" onclick="deleteItem(' + i + ')">Supprimer</button>' +
+          '</div>';
+        list.appendChild(card);
+      });
+    }
+
+    function setPreview(src) {
+      var img = document.getElementById('fPhotoPreview');
+      var empty = document.getElementById('fPhotoEmpty');
+      if (src) { img.src = src; img.style.display = 'block'; empty.style.display = 'none'; }
+      else { img.style.display = 'none'; empty.style.display = 'flex'; }
+    }
+
+    window.openModal = function () {
+      editIdx = -1; pendingFile = null;
+      document.getElementById('modalTitle').textContent = 'Ajouter un vin';
+      document.getElementById('fNom').value = '';
+      document.getElementById('fAppellation').value = '';
+      document.getElementById('fPhoto').value = '';
+      setPreview('');
+      document.getElementById('modal').classList.add('open');
+    };
+    window.closeModal = function () { document.getElementById('modal').classList.remove('open'); };
+
+    window.editItem = function (i) {
+      editIdx = i; pendingFile = null;
+      var v = data.vins[i];
+      document.getElementById('modalTitle').textContent = 'Modifier le vin';
+      document.getElementById('fNom').value = v.nom || '';
+      document.getElementById('fAppellation').value = v.appellation || '';
+      document.getElementById('fPhoto').value = '';
+      setPreview(v.image ? CMS.imgSrc(v.image) : '');
+      document.getElementById('modal').classList.add('open');
+    };
+
+    document.getElementById('fPhoto').addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        pendingFile = this.files[0];
+        setPreview(URL.createObjectURL(pendingFile));
+      }
+    });
+
+    window.saveItem = function () {
+      var nom = document.getElementById('fNom').value.trim();
+      if (!nom) { alert('Le nom est obligatoire.'); return; }
+      var appellation = document.getElementById('fAppellation').value.trim();
+      var btn = document.getElementById('btnSave');
+      btn.disabled = true;
+
+      var ready = pendingFile
+        ? (CMS.status('saving', 'Envoi de la photo…'), CMS.uploadImage(pendingFile))
+        : Promise.resolve(null);
+
+      ready.then(function (path) {
+        var msg;
+        if (editIdx >= 0) {
+          var v = data.vins[editIdx];
+          v.nom = nom; v.appellation = appellation;
+          if (path) v.image = path;
+          msg = 'Vin modifié : ' + nom;
+        } else {
+          data.vins.push({ id: 'v' + Date.now(), nom: nom, appellation: appellation, image: path || '' });
+          msg = 'Vin ajouté : ' + nom;
+        }
+        return persist(msg);
+      }).then(function () { closeModal(); render(); })
+        .catch(function (e) { CMS.status('error', 'Erreur — réessayez'); console.error(e); })
+        .then(function () { btn.disabled = false; });
+    };
+
+    window.deleteItem = function (i) {
+      var v = data.vins[i];
+      if (!confirm('Supprimer « ' + v.nom + ' » ?')) return;
+      data.vins.splice(i, 1);
+      persist('Vin supprimé : ' + v.nom).then(render);
+    };
+
+    window.moveItem = function (i, dir) {
+      var j = i + dir;
+      if (j < 0 || j >= data.vins.length) return;
+      var tmp = data.vins[i];
+      data.vins[i] = data.vins[j];
+      data.vins[j] = tmp;
+      render();
+      persist('Ordre des vins modifié');
+    };
+
+    document.getElementById('btnAdd').addEventListener('click', openModal);
+
+    /* ---- Tutoriel ---- */
+    var TOUR = [
+      { el: null, title: 'Gérer vos vins 🍷',
+        text: 'Cette page pilote le carrousel « Nos vins » du site.\nVoici comment ajouter une bouteille, changer sa photo ou l’ordre d’affichage.' },
+      { el: '#btnAdd', title: '1. Ajouter un vin',
+        text: 'Cliquez ici : saisissez le nom du domaine, l’appellation (facultatif), puis cliquez sur le cadre photo pour choisir une image de la bouteille depuis votre téléphone ou ordinateur.\nTerminez avec « Enregistrer ».' },
+      { el: '#list', title: '2. Modifier, réordonner, supprimer',
+        text: '✏️ Modifier : changer le nom, l’appellation ou remplacer la photo.\n↑ ↓ : changer l’ordre dans le carrousel.\nSupprimer : retirer le vin.' },
+      { el: '#statusEl', title: '3. Mise en ligne automatique',
+        text: 'Après « Enregistré ✓ », le site se met à jour tout seul en 1 minute environ.\nL’envoi d’une photo peut prendre quelques secondes de plus.' }
+    ];
+    document.getElementById('btnTuto').addEventListener('click', function () { Tour.start(TOUR); });
+  })();
+  </script>
+</body>
+</html>

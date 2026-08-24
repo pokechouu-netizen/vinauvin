@@ -1,0 +1,12 @@
+{
+  "_commentaire": "Carrousel des vins. Modifiable depuis /admin → Vins. L'ordre du tableau = l'ordre d'affichage.",
+  "vins": [
+    { "id": "v1", "nom": "Plus de 200 références d'ici et d'ailleurs", "appellation": "", "image": "assets/uploads/vin_1.jpg" },
+    { "id": "v2", "nom": "Domaine Christophe Pichon", "appellation": "Côte-Rôtie", "image": "assets/uploads/vin_2.jpg" },
+    { "id": "v3", "nom": "Domaine Cros de Romet", "appellation": "Cairanne", "image": "assets/uploads/vin_3.jpg" },
+    { "id": "v4", "nom": "Domaine des Bosquets", "appellation": "Gigondas", "image": "assets/uploads/vin_4.jpg" },
+    { "id": "v5", "nom": "Domaine Roucas Toumba", "appellation": "Vacqueyras", "image": "assets/uploads/vin_5.jpg" },
+    { "id": "v6", "nom": "Domaine Chaume Arnaud", "appellation": "Vinsobres", "image": "assets/uploads/vin_6.jpg" },
+    { "id": "v7", "nom": "Domaine Combier", "appellation": "Crozes Hermitage", "image": "assets/uploads/vin_7.jpg" }
+  ]
+}

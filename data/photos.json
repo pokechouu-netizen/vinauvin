@@ -1,0 +1,29 @@
+{
+  "_commentaire": "Photos du site. Modifiable depuis /admin → Photos. Chaque clé correspond à un emplacement précis sur le site.",
+  "photos": {
+    "img_hero": "assets/uploads/hero.jpg",
+    "img_philosophie": "assets/uploads/philosophie.jpg",
+    "img_saison_hiver": "assets/uploads/saison_hiver.jpg",
+    "img_saison_printemps": "assets/uploads/saison_printemps.jpg",
+    "img_saison_ete": "assets/uploads/saison_ete.jpg",
+    "img_saison_automne": "assets/uploads/saison_automne.jpg",
+    "img_galerie_1": "assets/uploads/galerie_1.jpg",
+    "img_galerie_2": "assets/uploads/galerie_2.jpg",
+    "img_galerie_3": "assets/uploads/galerie_3.jpg",
+    "img_galerie_4": "assets/uploads/galerie_4.jpg",
+    "img_galerie_5": "assets/uploads/galerie_5.jpg",
+    "img_galerie_6": "assets/uploads/galerie_6.jpg",
+    "img_galerie_7": "assets/uploads/galerie_7.jpg",
+    "img_galerie_8": "assets/uploads/galerie_8.jpg",
+    "img_galerie_9": "assets/uploads/galerie_9.jpg",
+    "img_galerie_10": "assets/uploads/galerie_10.jpg",
+    "img_galerie_11": "assets/uploads/galerie_11.jpg",
+    "img_galerie_12": "assets/uploads/galerie_12.jpg",
+    "img_terrasse_1": "assets/uploads/terrasse_1.jpg",
+    "img_terrasse_2": "assets/uploads/terrasse_2.jpg",
+    "img_produit_viande": "assets/uploads/produit_viande.jpg",
+    "img_produit_fromage": "assets/uploads/produit_fromage.jpg",
+    "img_produit_cave": "assets/uploads/produit_cave.jpg",
+    "img_logo": "assets/img/logo.png"
+  }
+}

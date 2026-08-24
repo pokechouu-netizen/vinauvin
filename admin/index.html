@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administration — Au Vin sur Vin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+  <div id="loginScreen">
+    <div class="brand">Au Vin sur Vin</div>
+    <h1>Espace d'administration</h1>
+    <p>Connectez-vous pour gérer le contenu de votre site : suggestions du moment, vins, photos, horaires et téléphone.</p>
+    <button class="btn-login" onclick="CMS.login()">Se connecter</button>
+  </div>
+
+  <div id="adminScreen">
+    <header class="hub-header">
+      <h1>Au Vin sur Vin — Administration</h1>
+      <div style="display:flex;gap:.75rem;align-items:center">
+        <button class="btn btn-ghost btn-sm" id="btnTuto">❓ Tutoriel</button>
+        <button class="btn-text" onclick="CMS.logout()">Déconnexion</button>
+      </div>
+    </header>
+
+    <div class="welcome">
+      <h2>Bonjour 👋</h2>
+      <p>Que souhaitez-vous modifier ? Vos changements apparaissent sur le site en ligne après ~1 minute.
+        Cliquez sur <strong>❓ Tutoriel</strong> pour une visite guidée.</p>
+    </div>
+
+    <div class="hub">
+      <a href="suggestions.html" class="hub-card" id="cardSuggestions">
+        <div class="hub-card__icon">🍽️</div>
+        <div class="hub-card__title">Suggestions du moment</div>
+        <div class="hub-card__desc">Ajouter, modifier, réordonner ou supprimer les plats et menus du moment — autant que vous voulez.</div>
+        <div class="hub-card__arrow">Ouvrir →</div>
+      </a>
+
+      <a href="vins.html" class="hub-card" id="cardVins">
+        <div class="hub-card__icon">🍷</div>
+        <div class="hub-card__title">Vins du carrousel</div>
+        <div class="hub-card__desc">Gérer les vins mis en avant : photo de la bouteille, nom du domaine et appellation.</div>
+        <div class="hub-card__arrow">Ouvrir →</div>
+      </a>
+
+      <a href="photos.html" class="hub-card" id="cardPhotos">
+        <div class="hub-card__icon">📷</div>
+        <div class="hub-card__title">Photos du site</div>
+        <div class="hub-card__desc">Remplacer n'importe quelle photo : accueil, saisons, galerie, terrasse, produits et logo.</div>
+        <div class="hub-card__arrow">Ouvrir →</div>
+      </a>
+
+      <a href="infos.html" class="hub-card" id="cardInfos">
+        <div class="hub-card__icon">⏰</div>
+        <div class="hub-card__title">Infos pratiques</div>
+        <div class="hub-card__desc">Horaires d'ouverture jour par jour, téléphone et fourchettes de prix.</div>
+        <div class="hub-card__arrow">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <script src="cms.js"></script>
+  <script src="tour.js"></script>
+  <script>
+    CMS.requireAuth();
+
+    var HUB_TOUR = [
+      { el: null, title: 'Bienvenue dans votre espace admin 🍷',
+        text: 'Cette visite guidée vous montre comment modifier vous-même votre site auvinsurvin.fr.\nChaque page de l’admin a aussi son propre bouton ❓ Tutoriel qui détaille les manipulations pas à pas.' },
+      { el: '#cardSuggestions', title: 'Suggestions du moment',
+        text: 'C’est ici que vous gérez les plats et menus affichés dans « Suggestions du moment ».\nVous pouvez en ajouter autant que vous voulez, les modifier, changer leur ordre ou les supprimer.' },
+      { el: '#cardVins', title: 'Vins du carrousel',
+        text: 'Gérez les bouteilles mises en avant dans la section « Nos vins » : photo, nom du domaine et appellation.' },
+      { el: '#cardPhotos', title: 'Photos du site',
+        text: 'Toutes les photos du site sont remplaçables ici : photo d’accueil, saisons, galerie, terrasse, produits et logo.\nCliquez sur une photo, choisissez la nouvelle image sur votre appareil, et c’est tout.' },
+      { el: '#cardInfos', title: 'Infos pratiques',
+        text: 'Horaires jour par jour (midi et soir), fermetures exceptionnelles, numéro de téléphone et fourchettes de prix.' },
+      { el: null, title: 'Comment ça marche ? 💾',
+        text: 'Dans chaque page, faites vos changements puis cliquez « Enregistrer ».\nLe site en ligne se met à jour automatiquement en 1 minute environ.\nPas besoin de sauvegarder ici : ouvrez simplement une rubrique pour commencer.' }
+    ];
+
+    document.getElementById('btnTuto').addEventListener('click', function () {
+      Tour.start(HUB_TOUR);
+    });
+  </script>
+</body>
+</html>
