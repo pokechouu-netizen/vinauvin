@@ -1,12 +1,47 @@
 {
   "_commentaire": "Horaires d'ouverture. Modifiable depuis /admin → Infos pratiques. Laisser vide ou écrire 'Fermé' pour un service fermé. La note sert aux fermetures exceptionnelles.",
   "horaires": [
-    { "jour": "Lundi", "midi": "11h00 - 15h00", "soir": "19h15 - 22h", "note": "" },
-    { "jour": "Mardi", "midi": "11h00 - 15h00", "soir": "19h15 - 22h", "note": "" },
-    { "jour": "Mercredi", "midi": "Fermé", "soir": "19h15 - 22h", "note": "" },
-    { "jour": "Jeudi", "midi": "11h00 - 15h00", "soir": "19h15 - 22h", "note": "" },
-    { "jour": "Vendredi", "midi": "11h00 - 15h00", "soir": "19h15 - 22h", "note": "" },
-    { "jour": "Samedi", "midi": "11h00 - 15h00", "soir": "19h15 - 22h", "note": "" },
-    { "jour": "Dimanche", "midi": "11h00 - 15h00", "soir": "19h15 - 22h", "note": "" }
+    {
+      "jour": "Lundi",
+      "midi": "11h00 - 15h00",
+      "soir": "19h15 - 22h",
+      "note": ""
+    },
+    {
+      "jour": "Mardi",
+      "midi": "11h00 - 15h00",
+      "soir": "19h15 - 22h",
+      "note": ""
+    },
+    {
+      "jour": "Mercredi",
+      "midi": "Fermé",
+      "soir": "19h15 - 22h",
+      "note": "haha"
+    },
+    {
+      "jour": "Jeudi",
+      "midi": "11h00 - 15h00",
+      "soir": "19h15 - 22h",
+      "note": ""
+    },
+    {
+      "jour": "Vendredi",
+      "midi": "11h00 - 15h00",
+      "soir": "19h15 - 22h",
+      "note": ""
+    },
+    {
+      "jour": "Samedi",
+      "midi": "11h00 - 15h00",
+      "soir": "19h15 - 22h",
+      "note": ""
+    },
+    {
+      "jour": "Dimanche",
+      "midi": "11h00 - 15h00",
+      "soir": "19h15 - 22h",
+      "note": ""
+    }
   ]
 }
