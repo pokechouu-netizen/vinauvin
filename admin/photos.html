@@ -33,12 +33,15 @@
     </div>
   </div>
 
-  <script src="cms.js"></script>
-  <script src="tour.js"></script>
+  <script src="cms.js?v=3"></script>
+  <script src="tour.js?v=3"></script>
   <script>
   (function () {
     'use strict';
     var FILE = 'data/photos.json', data = { photos: {} }, sha = '';
+    // Aperçus locaux des photos fraîchement choisies (clé → objectURL) :
+    // affichés immédiatement, sans attendre le déploiement du site (~1 min)
+    var freshPreviews = {};
 
     // Emplacements groupés par section du site
     var SECTIONS = [
@@ -106,14 +109,14 @@
         card.className = 'section-card';
         var grid = '<div class="photos-grid">';
         sec.slots.forEach(function (slot) {
-          var src = data.photos[slot.key] || '';
+          var src = freshPreviews[slot.key] || (data.photos[slot.key] ? CMS.imgSrc(data.photos[slot.key]) : '');
           grid += '<div class="photo-slot"><span class="photo-slot__label">' + CMS.eh(slot.label) + '</span>' +
             '<div class="photo-slot__wrap">' +
             '<input type="file" accept="image/*" data-key="' + slot.key + '" data-label="' + CMS.esc(slot.label) + '">' +
-            (src ? '<img src="' + CMS.esc(CMS.imgSrc(src)) + '" alt="">' :
+            (src ? '<img src="' + CMS.esc(src) + '" alt="">' :
               '<div class="photo-slot__empty">📷<br>Aucune photo<br>Cliquer pour ajouter</div>') +
             '</div>' +
-            '<div class="photo-slot__hint">Cliquer pour remplacer</div></div>';
+            '<div class="photo-slot__hint" data-hint="' + slot.key + '">Cliquer pour remplacer</div></div>';
         });
         grid += '</div>';
         card.innerHTML = '<div class="section-card__title">' + sec.titre + '</div>' + grid;
@@ -126,13 +129,23 @@
           var key = this.getAttribute('data-key');
           var label = this.getAttribute('data-label');
           var file = this.files[0];
+          // Aperçu immédiat de la nouvelle photo, avant même la fin de l'envoi
+          if (freshPreviews[key]) URL.revokeObjectURL(freshPreviews[key]);
+          freshPreviews[key] = URL.createObjectURL(file);
+          render();
+          var hint = wrap.querySelector('[data-hint="' + key + '"]');
+          if (hint) hint.textContent = 'Envoi en cours…';
           CMS.status('saving', 'Envoi de la photo…');
           CMS.uploadImage(file).then(function (path) {
             data.photos[key] = path;
             return persist('Photo remplacée : ' + label);
           }).then(render)
             .catch(function (e) {
-              CMS.status('error', (e && e.friendly) ? e.message : 'Erreur d\'envoi — réessayez');
+              delete freshPreviews[key];
+              render();
+              var msg = (e && e.friendly) ? e.message
+                : 'Erreur d\'envoi (' + String(e && e.message || e).slice(0, 120) + ')';
+              CMS.status('error', msg);
               console.error(e);
             });
         });

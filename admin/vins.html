@@ -65,12 +65,15 @@
     </div>
   </div>
 
-  <script src="cms.js"></script>
-  <script src="tour.js"></script>
+  <script src="cms.js?v=3"></script>
+  <script src="tour.js?v=3"></script>
   <script>
   (function () {
     'use strict';
     var FILE = 'data/vins.json', data = { vins: [] }, sha = '', editIdx = -1, pendingFile = null;
+    // Aperçus locaux des photos fraîchement envoyées (id vin → objectURL),
+    // affichés sans attendre le déploiement du site (~1 min)
+    var freshPreviews = {};
 
     CMS.requireAuth(load);
 
@@ -102,8 +105,9 @@
       data.vins.forEach(function (v, i) {
         var card = document.createElement('div');
         card.className = 'item-card';
+        var thumbSrc = freshPreviews[v.id] || (v.image ? CMS.imgSrc(v.image) : '');
         card.innerHTML =
-          (v.image ? '<img class="thumb" src="' + CMS.esc(CMS.imgSrc(v.image)) + '" alt="">' : '<div class="no-thumb">🍷</div>') +
+          (thumbSrc ? '<img class="thumb" src="' + CMS.esc(thumbSrc) + '" alt="">' : '<div class="no-thumb">🍷</div>') +
           '<div class="item-card__body"><div class="item-card__title">' + CMS.eh(v.nom) + '</div>' +
           (v.appellation ? '<div class="item-card__text">' + CMS.eh(v.appellation) + '</div>' : '') + '</div>' +
           '<div class="item-card__actions">' +
@@ -163,21 +167,28 @@
         ? (CMS.status('saving', 'Envoi de la photo…'), CMS.uploadImage(pendingFile))
         : Promise.resolve(null);
 
+      var localPreview = pendingFile ? URL.createObjectURL(pendingFile) : null;
       ready.then(function (path) {
-        var msg;
+        var msg, id;
         if (editIdx >= 0) {
           var v = data.vins[editIdx];
           v.nom = nom; v.appellation = appellation;
           if (path) v.image = path;
+          id = v.id;
           msg = 'Vin modifié : ' + nom;
         } else {
-          data.vins.push({ id: 'v' + Date.now(), nom: nom, appellation: appellation, image: path || '' });
+          id = 'v' + Date.now();
+          data.vins.push({ id: id, nom: nom, appellation: appellation, image: path || '' });
           msg = 'Vin ajouté : ' + nom;
         }
+        // Aperçu immédiat de la photo envoyée, sans attendre le déploiement
+        if (path && localPreview) freshPreviews[id] = localPreview;
         return persist(msg);
       }).then(function () { closeModal(); render(); })
         .catch(function (e) {
-          CMS.status('error', (e && e.friendly) ? e.message : 'Erreur d\'envoi — réessayez');
+          var msg = (e && e.friendly) ? e.message
+            : 'Erreur d\'envoi (' + String(e && e.message || e).slice(0, 120) + ')';
+          CMS.status('error', msg);
           console.error(e);
         })
         .then(function () { btn.disabled = false; });
