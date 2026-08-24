@@ -43,12 +43,20 @@
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 id="modalTitle">Ajouter une suggestion</h2>
       <div class="fg" id="fgNom">
-        <label>Nom du plat / menu *</label>
+        <label><span class="lang-tag">FR</span>Nom du plat / menu *</label>
         <input type="text" id="fNom" placeholder="Ex : Tartare de bœuf frais au couteau">
       </div>
       <div class="fg" id="fgDesc">
-        <label>Description <span class="hint">(facultatif — s'affiche sous le nom)</span></label>
+        <label><span class="lang-tag">FR</span>Description <span class="hint">(facultatif — s'affiche sous le nom)</span></label>
         <textarea id="fDesc" placeholder="Ex : Servi avec frites maison et salade"></textarea>
+      </div>
+      <div class="fg">
+        <label><span class="lang-tag">EN</span>Nom en anglais <span class="hint">(facultatif — pour la version anglaise du site ; sinon le français est affiché)</span></label>
+        <input type="text" id="fNomEn" placeholder="Ex : Hand-cut fresh beef tartare">
+      </div>
+      <div class="fg">
+        <label><span class="lang-tag">EN</span>Description en anglais <span class="hint">(facultatif)</span></label>
+        <textarea id="fDescEn" placeholder="Ex : Served with homemade fries and salad"></textarea>
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
@@ -95,7 +103,8 @@
         var card = document.createElement('div');
         card.className = 'item-card';
         card.innerHTML =
-          '<div class="item-card__body"><div class="item-card__title">' + CMS.eh(s.nom) + '</div>' +
+          '<div class="item-card__body"><div class="item-card__title">' + CMS.eh(s.nom) +
+          (s.nom_en ? ' <span class="lang-tag" title="Traduction anglaise renseignée">EN ✓</span>' : '') + '</div>' +
           (s.description ? '<div class="item-card__text">' + CMS.eh(s.description) + '</div>' : '') + '</div>' +
           '<div class="item-card__actions">' +
           '<button class="btn btn-ghost btn-sm" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveItem(' + i + ',-1)">↑</button>' +
@@ -112,6 +121,8 @@
       document.getElementById('modalTitle').textContent = 'Ajouter une suggestion';
       document.getElementById('fNom').value = '';
       document.getElementById('fDesc').value = '';
+      document.getElementById('fNomEn').value = '';
+      document.getElementById('fDescEn').value = '';
       document.getElementById('modal').classList.add('open');
     };
     window.closeModal = function () { document.getElementById('modal').classList.remove('open'); };
@@ -122,6 +133,8 @@
       document.getElementById('modalTitle').textContent = 'Modifier la suggestion';
       document.getElementById('fNom').value = s.nom || '';
       document.getElementById('fDesc').value = s.description || '';
+      document.getElementById('fNomEn').value = s.nom_en || '';
+      document.getElementById('fDescEn').value = s.description_en || '';
       document.getElementById('modal').classList.add('open');
     };
 
@@ -129,13 +142,16 @@
       var nom = document.getElementById('fNom').value.trim();
       if (!nom) { alert('Le nom est obligatoire.'); return; }
       var desc = document.getElementById('fDesc').value.trim();
+      var nomEn = document.getElementById('fNomEn').value.trim();
+      var descEn = document.getElementById('fDescEn').value.trim();
       var msg;
       if (editIdx >= 0) {
-        data.suggestions[editIdx].nom = nom;
-        data.suggestions[editIdx].description = desc;
+        var s = data.suggestions[editIdx];
+        s.nom = nom; s.description = desc;
+        s.nom_en = nomEn; s.description_en = descEn;
         msg = 'Suggestion modifiée : ' + nom;
       } else {
-        data.suggestions.push({ id: 's' + Date.now(), nom: nom, description: desc });
+        data.suggestions.push({ id: 's' + Date.now(), nom: nom, description: desc, nom_en: nomEn, description_en: descEn });
         msg = 'Suggestion ajoutée : ' + nom;
       }
       persist(msg).then(function () { closeModal(); render(); });
@@ -165,7 +181,7 @@
       { el: null, title: 'Gérer vos suggestions 🍽️',
         text: 'Cette page pilote la section « Suggestions du moment » du site.\nVoici comment ajouter, modifier, réordonner ou supprimer un plat.' },
       { el: '#btnAdd', title: '1. Ajouter une suggestion',
-        text: 'Cliquez ici pour ouvrir la fenêtre d’ajout : saisissez le nom du plat (obligatoire) et une description si vous voulez, puis « Enregistrer ».\nAucune limite : ajoutez autant de suggestions que nécessaire.' },
+        text: 'Cliquez ici pour ouvrir la fenêtre d’ajout : saisissez le nom du plat (obligatoire) et une description si vous voulez, puis « Enregistrer ».\nLes champs « EN » sont pour la version anglaise du site : facultatifs — si vous les laissez vides, le texte français s’affiche aussi en anglais.\nAucune limite : ajoutez autant de suggestions que nécessaire.' },
       { el: '#list', title: '2. Modifier, réordonner, supprimer',
         text: 'Chaque ligne est une suggestion affichée sur le site.\n✏️ Modifier : changer le nom ou la description.\n↑ ↓ : changer l’ordre d’affichage.\nSupprimer : retirer le plat (une confirmation est demandée).' },
       { el: '#statusEl', title: '3. L’enregistrement est automatique',

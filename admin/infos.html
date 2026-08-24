@@ -108,24 +108,25 @@
 
     function renderHoraires() {
       var wrap = document.getElementById('horairesRows');
-      wrap.innerHTML = '<div class="frow" style="grid-template-columns:90px 1fr 1fr 1fr;gap:.5rem;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase"><span></span><span>Midi</span><span>Soir</span><span>Note</span></div>';
+      wrap.innerHTML = '<div class="frow" style="grid-template-columns:90px 1fr 1fr 1fr 1fr;gap:.5rem;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase"><span></span><span>Midi</span><span>Soir</span><span>Note</span><span>Note (EN)</span></div>';
       JOURS.forEach(function (jour) {
         var d = getDay(jour);
         var row = document.createElement('div');
         row.className = 'frow';
-        row.style.cssText = 'grid-template-columns:90px 1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem;align-items:center';
+        row.style.cssText = 'grid-template-columns:90px 1fr 1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem;align-items:center';
         row.innerHTML =
           '<strong style="font-size:.85rem">' + jour + '</strong>' +
           '<input type="text" data-jour="' + jour + '" data-field="midi" value="' + CMS.esc(d.midi) + '" placeholder="Fermé" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">' +
           '<input type="text" data-jour="' + jour + '" data-field="soir" value="' + CMS.esc(d.soir) + '" placeholder="Fermé" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">' +
-          '<input type="text" data-jour="' + jour + '" data-field="note" value="' + CMS.esc(d.note) + '" placeholder="—" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">';
+          '<input type="text" data-jour="' + jour + '" data-field="note" value="' + CMS.esc(d.note) + '" placeholder="—" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">' +
+          '<input type="text" data-jour="' + jour + '" data-field="note_en" value="' + CMS.esc(d.note_en || '') + '" placeholder="—" style="padding:.45rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;width:100%">';
         wrap.appendChild(row);
       });
     }
 
     document.getElementById('btnSaveHoraires').addEventListener('click', function () {
       var rows = {};
-      JOURS.forEach(function (j) { rows[j] = { jour: j, midi: '', soir: '', note: '' }; });
+      JOURS.forEach(function (j) { rows[j] = { jour: j, midi: '', soir: '', note: '', note_en: '' }; });
       document.querySelectorAll('#horairesRows input[data-jour]').forEach(function (inp) {
         rows[inp.getAttribute('data-jour')][inp.getAttribute('data-field')] = inp.value.trim();
       });
@@ -159,7 +160,7 @@
       { el: null, title: 'Infos pratiques ⏰',
         text: 'Cette page regroupe les horaires d’ouverture, le numéro de téléphone et les fourchettes de prix affichés sur le site.' },
       { el: '#cardHoraires', title: '1. Les horaires',
-        text: 'Une ligne par jour, avec le service du midi et celui du soir.\nÉcrivez « Fermé » (ou laissez vide) quand c’est fermé.\nLa colonne Note sert aux fermetures exceptionnelles (congés, jours fériés…).\nPuis cliquez « Enregistrer les horaires ».' },
+        text: 'Une ligne par jour, avec le service du midi et celui du soir.\nÉcrivez « Fermé » (ou laissez vide) quand c’est fermé.\nLa colonne Note sert aux fermetures exceptionnelles (congés, jours fériés…) ; « Note (EN) » est sa traduction anglaise, facultative.\nPuis cliquez « Enregistrer les horaires ».' },
       { el: '#cardTel', title: '2. Le téléphone',
         text: 'Le numéro affiché partout sur le site (bouton « Réserver », section contact…).\nModifiez-le puis cliquez « Enregistrer ».' },
       { el: '#cardPrix', title: '3. Les prix',

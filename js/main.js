@@ -81,21 +81,22 @@
         jour_fr: h.jour,
         jour_en: h.jour,
         note_fr: h.note || '',
-        note_en: h.note || ''
+        note_en: (h.note_en && String(h.note_en).trim()) || h.note || ''
       });
     });
   }
 
-  // data/suggestions.json → { suggestions: [{nom, description}] }
+  // data/suggestions.json → { suggestions: [{nom, description, nom_en, description_en}] }
+  // Les champs *_en sont optionnels : repli sur le français s'ils sont vides.
   function processSuggestions(d) {
     if (!d || !Array.isArray(d.suggestions)) return;
     d.suggestions.forEach(function (s) {
       if (!s || !s.nom || !String(s.nom).trim()) return;
       sheetData.carte.push({
         nom_fr: s.nom,
-        nom_en: s.nom,
+        nom_en: (s.nom_en && String(s.nom_en).trim()) || s.nom,
         desc_fr: s.description || '',
-        desc_en: s.description || '',
+        desc_en: (s.description_en && String(s.description_en).trim()) || s.description || '',
         prix: ''
       });
     });
