@@ -1,7 +1,7 @@
 {
   "_commentaire": "Photos du site. Modifiable depuis /admin → Photos. Chaque clé correspond à un emplacement précis sur le site.",
   "photos": {
-    "img_hero": "assets/uploads/1787604417711_38.jpg",
+    "img_hero": "assets/uploads/1787604900476_42.jpg",
     "img_philosophie": "assets/uploads/philosophie.jpg",
     "img_saison_hiver": "assets/uploads/saison_hiver.jpg",
     "img_saison_printemps": "assets/uploads/saison_printemps.jpg",
