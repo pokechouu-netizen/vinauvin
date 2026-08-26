@@ -5,43 +5,50 @@
       "jour": "Lundi",
       "midi": "11h00 - 15h00",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "zdzd",
+      "note_en": ""
     },
     {
       "jour": "Mardi",
       "midi": "11h00 - 15h00",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "",
+      "note_en": ""
     },
     {
       "jour": "Mercredi",
       "midi": "Fermé",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "",
+      "note_en": ""
     },
     {
       "jour": "Jeudi",
       "midi": "11h00 - 15h00",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "",
+      "note_en": ""
     },
     {
       "jour": "Vendredi",
       "midi": "11h00 - 15h00",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "",
+      "note_en": ""
     },
     {
       "jour": "Samedi",
       "midi": "11h00 - 15h00",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "",
+      "note_en": ""
     },
     {
       "jour": "Dimanche",
       "midi": "11h00 - 15h00",
       "soir": "19h15 - 22h",
-      "note": ""
+      "note": "",
+      "note_en": ""
     }
   ]
 }
