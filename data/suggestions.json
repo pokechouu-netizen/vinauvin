@@ -88,8 +88,10 @@
     },
     {
       "id": "s16",
-      "nom": "Tarte rhubarbe",
-      "description": ""
+      "nom": "Tarte figue et rhubarbe",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     }
   ]
 }
