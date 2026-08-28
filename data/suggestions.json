@@ -62,8 +62,10 @@
     },
     {
       "id": "s12",
-      "nom": "Le midi, menus à 25 € et 32 €",
-      "description": ""
+      "nom": "Le midi: carte et menus à 17€ , 28€ sauf we et fériés",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s13",
