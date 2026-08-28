@@ -13,8 +13,10 @@
     },
     {
       "id": "s3",
-      "nom": "Escargots à l'ail des ours",
-      "description": ""
+      "nom": "Escargots au pesto de roquette",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s4",
