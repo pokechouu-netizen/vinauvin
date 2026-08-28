@@ -55,8 +55,10 @@
     },
     {
       "id": "s11",
-      "nom": "Crème au citron",
-      "description": ""
+      "nom": "Crème au citron et rhubarbe confite",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s12",
