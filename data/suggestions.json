@@ -48,8 +48,10 @@
     },
     {
       "id": "s10",
-      "nom": "Abricots rôtis",
-      "description": ""
+      "nom": "Figues noires de Caromb",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s11",
