@@ -43,8 +43,10 @@
     },
     {
       "id": "s9",
-      "nom": "Entrecôte d'Aubrac",
-      "description": ""
+      "nom": "Entrecôte d'Aubrac ~340gr",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s10",
