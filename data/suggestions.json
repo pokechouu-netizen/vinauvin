@@ -32,8 +32,10 @@
     },
     {
       "id": "s6",
-      "nom": "Tartare de bœuf frais au couteau",
-      "description": ""
+      "nom": "Ravioles artisanales",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s7",
