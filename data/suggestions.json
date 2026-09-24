@@ -75,8 +75,10 @@
     },
     {
       "id": "s13",
-      "nom": "Formule du jour le midi de 17 à 22 € (hors week-ends et jours fériés)",
-      "description": ""
+      "nom": "Formule du jour le midi de 17 à 25 € (hors week-ends et jours fériés)",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s14",
