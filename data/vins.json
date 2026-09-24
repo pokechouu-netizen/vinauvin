@@ -42,6 +42,12 @@
       "nom": "Domaine Combier",
       "appellation": "Crozes-Hermitage",
       "image": "assets/uploads/vin_7.jpg"
+    },
+    {
+      "id": "v1790293843612",
+      "nom": "Lapierre,Foillard,Thevenet...",
+      "appellation": "Morgon",
+      "image": "assets/uploads/1790293840091_20260923_104106_recadre.jpg"
     }
   ]
 }
