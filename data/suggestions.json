@@ -8,8 +8,10 @@
     },
     {
       "id": "s2",
-      "nom": "Carpaccio de bœuf frais",
-      "description": ""
+      "nom": "Terrine de campagne",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s4",
