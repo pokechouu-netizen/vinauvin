@@ -41,8 +41,10 @@
     },
     {
       "id": "s7",
-      "nom": "Croustillant de veau fermier aux légumes estivaux et lait de coco",
-      "description": ""
+      "nom": "Croustillant de Bœuf au Vin de Cairanne",
+      "description": "",
+      "nom_en": "",
+      "description_en": ""
     },
     {
       "id": "s8",
