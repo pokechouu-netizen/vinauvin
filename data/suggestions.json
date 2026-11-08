@@ -73,6 +73,11 @@
       "description_en": ""
     },
     {
+      "id": "s15",
+      "nom": "Fromages fermiers au lait cru",
+      "description": ""
+    },
+    {
       "id": "s11",
       "nom": "Entremet maison au citron",
       "description": "",
@@ -85,11 +90,6 @@
       "description": "",
       "nom_en": "",
       "description_en": ""
-    },
-    {
-      "id": "s15",
-      "nom": "Fromages fermiers au lait cru",
-      "description": ""
     },
     {
       "id": "s13",
